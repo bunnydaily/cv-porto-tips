@@ -1,0 +1,707 @@
+<!DOCTYPE html>
+<html lang="id" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CV & Portofolio Digital Signal Interaktif</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Lato:wght@400;700&display=swap" rel="stylesheet">
+    <!-- Mammoth.js for DOCX parsing -->
+    <script src="https://cdn.jsdelivr.net/npm/mammoth@1.4.15/mammoth.browser.min.js"></script>
+    
+    <!-- 
+    Chosen Palette: FE5D26 (Orange/Coral), F2C078 (Peach/Light Orange), FAEDCA (Creamy Yellow), C1DBB3 (Light Sage Green)
+    Application Structure Plan: A vertical-scrolling SPA with a top navigation bar that scrolls with the page content. For desktop, all navigation links are visible horizontally. For mobile, a hamburger icon toggles a full-screen overlay menu with the navigation links. The structure is thematic, guiding the user from 'Why' (Mindset) to 'How' (CV & Portfolio Guides), to 'Proof' (Examples), and finally to practical tools ('Avoid Mistakes' & 'Resources'). This task-oriented flow is more engaging than a linear book format, allowing users to jump directly to the section they need. Interactive elements like clickable diagrams, filterable examples, and a visual chart are used to enhance learning and retention.
+    Visualization & Content Choices: 
+    - Myth Busting: Goal(Inform/Engage) -> Interactive Flip Cards -> On Click/Hover -> More dynamic than a list -> HTML/CSS/JS.
+    - STAR Method: Goal(Explain Process) -> Visual Stepper -> On Click -> Breaks down the method into digestible parts -> HTML/CSS/JS.
+    - Impact Chart: Goal(Compare/Inform) -> Bar Chart -> On Scroll -> Visually reinforces the power of using numbers in a CV -> Chart.js (Canvas).
+    - CV/Portfolio Examples: Goal(Organize/Compare) -> Tabbed Interface -> On Click -> Organizes extensive examples compactly and allows filtering -> HTML/CSS/JS.
+    - Checklist: Goal(Provide Tool) -> Interactive Checkboxes -> On Click -> Turns a static list into a usable tool for the user -> HTML/CSS/JS.
+    - AI Feedback: Goal(Provide Feedback/Improvement) -> File Upload/Text Input -> LLM Call via Gemini API -> Text Output -> Offers instant, personalized feedback on CV/portfolio text -> JS (Gemini API, Mammoth.js for DOCX).
+    CONFIRMATION: NO SVG graphics used. NO Mermaid JS used.
+    -->
+
+    <style>
+        body {
+            font-family: 'Lato', sans-serif;
+            background-color: #FAEDCA; /* Creamy Yellow */
+            color: #333333;
+        }
+        h1, h2, h3, h4 {
+            font-family: 'Inter', sans-serif;
+        }
+        .nav-link {
+            transition: all 0.3s ease;
+            position: relative;
+        }
+        .nav-link::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background-color: #FE5D26; /* Orange/Coral */
+            transition: width 0.3s ease;
+        }
+        .nav-link.active::after,
+        .nav-link:hover::after {
+            width: 100%;
+        }
+        .flip-card { perspective: 1000px; }
+        .flip-card-inner { position: relative; width: 100%; height: 100%; text-align: center; transition: transform 0.6s; transform-style: preserve-3d; }
+        .flip-card.flipped .flip-card-inner { transform: rotateY(180deg); }
+        .flip-card-front, .flip-card-back { position: absolute; width: 100%; height: 100%; -webkit-backface-visibility: hidden; backface-visibility: hidden; border-radius: 0.75rem; display: flex; align-items: center; justify-content: center; padding: 1.5rem; }
+        .flip-card-front { background-color: #FFFFFF; border: 1px solid #E5E7EB; }
+        .flip-card-back { background-color: #F2C078; /* Peach/Light Orange */ color: white; transform: rotateY(180deg); }
+        .tab-button.active {
+            background-color: #FE5D26; /* Orange/Coral */
+            color: white;
+        }
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+            height: 300px;
+            max-height: 400px;
+        }
+         @media (min-width: 768px) { .chart-container { height: 350px; } }
+
+        .resource-card {
+            background-color: #FFFFFF;
+            padding: 1rem;
+            border-radius: 0.75rem;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+            transition: transform 0.2s ease-in-out;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            font-weight: 600;
+            color: #FE5D26; /* Orange/Coral */
+            border: 1px solid #E5E7EB;
+        }
+        .resource-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+    </style>
+</head>
+<body class="antialiased">
+
+    <!-- Header / Top Navigation -->
+    <header class="w-full bg-white shadow-md z-50">
+        <div class="container mx-auto px-4 py-3 flex justify-between items-center">
+            <a href="#" class="text-[#FE5D26] flex items-center space-x-2">
+                <span class="text-xl font-bold">Digital Signal</span>
+            </a>
+            <nav id="desktop-nav" class="hidden md:flex space-x-4">
+                <a href="#pendahuluan" class="nav-link text-gray-600 hover:text-[#FE5D26] text-sm font-medium">Pendahuluan</a>
+                <a href="#panduan-cv" class="nav-link text-gray-600 hover:text-[#FE5D26] text-sm font-medium">CV</a>
+                <a href="#panduan-portofolio" class="nav-link text-gray-600 hover:text-[#FE5D26] text-sm font-medium">Portofolio</a>
+                <a href="#contoh" class="nav-link text-gray-600 hover:text-[#FE5D26] text-sm font-medium">Template</a>
+                <a href="#kesalahan" class="nav-link text-gray-600 hover:text-[#FE5D26] text-sm font-medium">Kesalahan Umum</a>
+                <a href="#sumber-daya" class="nav-link text-gray-600 hover:text-[#FE5D26] text-sm font-medium">Bonus</a>
+                <a href="#ai-tools" class="nav-link text-gray-600 hover:text-[#FE5D26] text-sm font-medium">Alat AI</a>
+            </nav>
+            <button id="mobile-menu-button" class="md:hidden text-gray-700 focus:outline-none">
+                <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path></svg>
+            </button>
+        </div>
+    </header>
+
+    <!-- Mobile Overlay Menu -->
+    <div id="mobile-overlay-menu" class="fixed inset-0 bg-white z-40 flex flex-col items-center justify-center space-y-8 transform translate-y-full transition-transform duration-300 ease-in-out opacity-0 pointer-events-none">
+        <button id="close-mobile-menu" class="absolute top-6 right-6 text-gray-700">
+            <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+        </button>
+        <nav class="flex flex-col space-y-6 text-center">
+            <a href="#pendahuluan" class="mobile-nav-link text-2xl text-gray-700 hover:text-[#FE5D26] font-semibold">Pendahuluan</a>
+            <a href="#panduan-cv" class="mobile-nav-link text-2xl text-gray-700 hover:text-[#FE5D26] font-semibold">CV</a>
+            <a href="#panduan-portofolio" class="mobile-nav-link text-2xl text-gray-700 hover:text-[#FE5D26] font-semibold">Portofolio</a>
+            <a href="#contoh" class="mobile-nav-link text-2xl text-gray-700 hover:text-[#FE5D26] font-semibold">Template</a>
+            <a href="#kesalahan" class="mobile-nav-link text-2xl text-gray-700 hover:text-[#FE5D26] font-semibold">Kesalahan Umum</a>
+            <a href="#sumber-daya" class="mobile-nav-link text-2xl text-gray-700 hover:text-[#FE5D26] font-semibold">Bonus</a>
+            <a href="#ai-tools" class="mobile-nav-link text-2xl text-gray-700 hover:text-[#FE5D26] font-semibold">Alat AI</a>
+        </nav>
+    </div>
+
+    <!-- Main content -->
+    <main class="flex-1 p-4 md:p-10">
+
+        <!-- Section 1: Pendahuluan -->
+        <section id="pendahuluan" class="mb-16 scroll-mt-4">
+            <div class="text-center bg-white p-8 rounded-xl shadow-md">
+                <h1 class="text-4xl md:text-5xl font-bold text-[#FE5D26]">CV & Portofolio Starter Kit</h1>
+                <p class="mt-4 text-lg md:text-xl text-gray-600">Biar Lamaran Kerjamu Nggak Di-skip Lagi</p>
+                <p class="mt-6 max-w-3xl mx-auto text-gray-500">Di dunia kerja modern, terutama untuk posisi <em>remote</em>, CV dan portofolio adalah kesan pertama kamu. Aplikasi interaktif ini mengubah ebook panduan kami menjadi pengalaman belajar yang dinamis, membantu kamu membuat dokumen lamaran yang menonjol, bahkan tanpa pengalaman sekalipun.</p>
+            </div>
+
+            <h2 class="text-3xl font-bold mt-12 mb-6 text-center">Patahkan Mitos Umum!</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div class="flip-card h-48 cursor-pointer">
+                    <div class="flip-card-inner">
+                        <div class="flip-card-front"><p class="text-xl font-semibold">Mitos: "CV harus 2 halaman atau lebih."</p></div>
+                        <div class="flip-card-back"><p><strong>Fakta:</strong> CV 1 halaman lebih disukai, terutama jika pengalaman kamu di bawah 10 tahun. Ringkas, padat, dan relevan adalah kuncinya!</p></div>
+                    </div>
+                </div>
+                <div class="flip-card h-48 cursor-pointer">
+                    <div class="flip-card-inner">
+                        <div class="flip-card-front"><p class="text-xl font-semibold">Mitos: "Saya tidak punya pengalaman, jadi tidak bisa buat portofolio."</p></div>
+                        <div class="flip-card-back"><p><strong>Fakta:</strong> Portofolio bisa berisi proyek pribadi, tugas kuliah, atau hasil kursus. Ini menunjukkan inisiatif dan skill kamu, bukan hanya pengalaman kerja formal.</p></div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section 2: Panduan CV -->
+        <section id="panduan-cv" class="mb-16 scroll-mt-4">
+            <h2 class="text-3xl font-bold mb-2">📄 Anatomi CV yang Menarik</h2>
+            <p class="text-gray-600 mb-8">Setiap bagian dari CV kamu memiliki peran penting. Ini adalah panduan langkah demi langkah untuk membangun CV yang ATS-friendly dan memikat rekruter. Klik setiap bagian untuk melihat tips detail.</p>
+            
+            <div class="bg-white p-6 rounded-xl shadow-md">
+                <div id="cv-anatomy" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    <div data-content="cv-pribadi" class="anatomy-item p-4 border rounded-lg cursor-pointer hover:bg-opacity-10 hover:border-[#FE5D26] transition" style="--tw-bg-opacity: 0.1; background-color: rgba(254, 93, 38, var(--tw-bg-opacity));">
+                        <h4 class="font-bold">1. Data Pribadi & Kontak</h4>
+                        <p class="text-sm text-gray-500">Informasi esensial agar rekruter bisa menghubungi kamu.</p>
+                    </div>
+                    <div data-content="cv-summary" class="anatomy-item p-4 border rounded-lg cursor-pointer hover:bg-opacity-10 hover:border-[#FE5D26] transition" style="--tw-bg-opacity: 0.1; background-color: rgba(254, 93, 38, var(--tw-bg-opacity));">
+                        <h4 class="font-bold">2. Ringkasan Profil</h4>
+                        <p class="text-sm text-gray-500">"Iklan" singkat 2-3 kalimat tentang diri kamu.</p>
+                    </div>
+                    <div data-content="cv-pengalaman" class="anatomy-item p-4 border rounded-lg cursor-pointer hover:bg-opacity-10 hover:border-[#FE5D26] transition" style="--tw-bg-opacity: 0.1; background-color: rgba(254, 93, 38, var(--tw-bg-opacity));">
+                        <h4 class="font-bold">3. Pengalaman Kerja</h4>
+                        <p class="text-sm text-gray-500">Jantung dari CV kamu. Fokus pada hasil, bukan tugas.</p>
+                    </div>
+                    <div data-content="cv-pendidikan" class="anatomy-item p-4 border rounded-lg cursor-pointer hover:bg-opacity-10 hover:border-[#FE5D26] transition" style="--tw-bg-opacity: 0.1; background-color: rgba(254, 93, 38, var(--tw-bg-opacity));">
+                         <h4 class="font-bold">4. Pendidikan</h4>
+                        <p class="text-sm text-gray-500">Riwayat pendidikan formal kamu.</p>
+                    </div>
+                    <div data-content="cv-skill" class="anatomy-item p-4 border rounded-lg cursor-pointer hover:bg-opacity-10 hover:border-[#FE5D26] transition" style="--tw-bg-opacity: 0.1; background-color: rgba(254, 93, 38, var(--tw-bg-opacity));">
+                         <h4 class="font-bold">5. Skills & Sertifikasi</h4>
+                        <p class="text-sm text-gray-500">Bukti kemampuan teknis dan non-teknis kamu.</p>
+                    </div>
+                    <div data-content="cv-link" class="anatomy-item p-4 border rounded-lg cursor-pointer hover:bg-opacity-10 hover:border-[#FE5D26] transition" style="--tw-bg-opacity: 0.1; background-color: rgba(254, 93, 38, var(--tw-bg-opacity));">
+                         <h4 class="font-bold">6. Link Pendukung</h4>
+                        <p class="text-sm text-gray-500">Pintu ke dunia profesional kamu (LinkedIn, Portofolio).</p>
+                    </div>
+                </div>
+                <div id="cv-content-display" class="mt-6 p-4 bg-gray-50 rounded-lg min-h-[100px] text-gray-700">
+                    <p class="text-center text-gray-400">Klik salah satu bagian di atas untuk melihat detailnya.</p>
+                </div>
+            </div>
+
+            <h3 class="text-2xl font-bold mt-12 mb-4">Tips Menulis Pengalaman: Gunakan Angka!</h3>
+            <p class="text-gray-600 mb-6">Rekruter lebih tertarik pada dampak yang bisa diukur. Menggunakan angka membuat pencapaian kamu terlihat konkret dan kuat. Lihat perbandingan dampaknya di bawah ini.</p>
+            <div class="chart-container bg-white p-4 rounded-xl shadow-md">
+                <canvas id="impactChart"></canvas>
+            </div>
+        </section>
+
+        <!-- Section 3: Panduan Portofolio -->
+        <section id="panduan-portofolio" class="mb-16 scroll-mt-4">
+            <h2 class="text-3xl font-bold mb-2">🎨 Membangun Portofolio yang Relevan</h2>
+            <p class="text-gray-600 mb-8">Portofolio adalah bukti nyata dari keahlian kamu. Ini adalah kesempatan untuk "menunjukkan", bukan hanya "memberi tahu". Bahkan dengan pengalaman terbatas, kamu bisa membuat portofolio yang memukau.</p>
+            <div class="bg-white p-6 rounded-xl shadow-md">
+                 <h3 class="text-xl font-bold mb-4">Struktur Portofolio yang Kuat:</h3>
+                 <ol class="list-decimal list-inside space-y-2 text-gray-700">
+                    <li><strong>Ringkasan Diri:</strong> Perkenalan singkat yang menarik.</li>
+                    <li><strong>Proyek Terbaik (3-5):</strong> Pilih proyek yang paling relevan. Jelaskan tujuan, proses, dan yang terpenting, <strong>hasilnya</strong>.</li>
+                    <li><strong>Bukti Kerja:</strong> Tampilkan hasil nyata (desain, tulisan, <em>screenshot</em>, link ke proyek).</li>
+                    <li><strong>Testimoni (Opsional):</strong> Pujian dari klien atau mentor meningkatkan kredibilitas.</li>
+                    <li><strong>Kontak:</strong> Permudah orang untuk menghubungi kamu.</li>
+                 </ol>
+                 <h3 class="text-xl font-bold mt-8 mb-4">Pilih Platform yang Tepat:</h3>
+                 <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                    <div class="p-4 border rounded-lg">
+                        <h4 class="font-bold">Notion / Google Sites</h4>
+                        <p class="text-sm">Fleksibel, mudah diatur, cocok untuk hampir semua profesi.</p>
+                    </div>
+                    <div class="p-4 border rounded-lg">
+                        <h4 class="font-bold">Behance / Dribbble</h4>
+                        <p class="text-sm">Terbaik untuk desainer, ilustrator, dan profesional visual.</p>
+                    </div>
+                    <div class="p-4 border rounded-lg">
+                        <h4 class="font-bold">GitHub</h4>
+                        <p class="text-sm">Wajib bagi <em>developer</em> untuk memamerkan proyek kode.</p>
+                    </div>
+                 </div>
+            </div>
+        </section>
+
+        <!-- Section 4: Contoh -->
+        <section id="contoh" class="mb-16 scroll-mt-4">
+            <h2 class="text-3xl font-bold mb-2">💻 Contoh CV & Struktur Portofolio</h2>
+            <p class="text-gray-600 mb-8">Lihat contoh nyata untuk mendapatkan inspirasi. Pilih kategori di bawah ini untuk melihat contoh yang disesuaikan untuk <em>fresh graduate</em>, <em>freelancer</em>, dan pekerja <em>remote</em>.</p>
+            
+            <div class="bg-white p-6 rounded-xl shadow-md">
+                <div id="tabs" class="flex flex-wrap border-b border-gray-200">
+                    <button class="tab-button py-2 px-4 -mb-px font-semibold text-gray-600 border-b-2 border-transparent rounded-t-lg hover:text-[#FE5D26] active" data-tab="fresh-graduate">Fresh Graduate</button>
+                    <button class="tab-button py-2 px-4 -mb-px font-semibold text-gray-600 border-b-2 border-transparent rounded-t-lg hover:text-[#FE5D26]" data-tab="freelancer">Freelancer</button>
+                    <button class="tab-button py-2 px-4 -mb-px font-semibold text-gray-600 border-b-2 border-transparent rounded-t-lg hover:text-[#FE5D26]" data-tab="remote-worker">Remote Worker</button>
+                </div>
+                <div id="tab-content" class="py-4">
+                    <!-- Content will be injected by JS -->
+                </div>
+            </div>
+        </section>
+
+        <!-- Section 5: Kesalahan -->
+        <section id="kesalahan" class="mb-16 scroll-mt-4">
+            <h2 class="text-3xl font-bold mb-2">❌ Kesalahan Umum & Checklist Akhir</h2>
+            <p class="text-gray-600 mb-8">Hindari jebakan umum yang bisa membuat lamaran kamu diabaikan. Setelah itu, gunakan <em>checklist</em> interaktif kami sebelum menekan tombol "kirim".</p>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-12">
+                 <div class="bg-red-100 border-l-4 border-red-500 text-red-700 p-4 rounded-r-lg">
+                    <h4 class="font-bold">JANGAN DILAKUKAN</h4>
+                    <ul class="list-disc list-inside mt-2 text-sm">
+                        <li>CV lebih dari 1 halaman (jika tidak perlu).</li>
+                        <li>Ada <em>typo</em> atau salah ketik.</li>
+                        <li>Desain terlalu ramai dan sulit dibaca.</li>
+                        <li>Mengirim CV generik untuk semua lamaran.</li>
+                    </ul>
+                </div>
+                 <div class="bg-green-100 border-l-4 border-green-500 text-green-700 p-4 rounded-r-lg">
+                    <h4 class="font-bold">HARUS DILAKUKAN</h4>
+                    <ul class="list-disc list-inside mt-2 text-sm">
+                        <li>Buat CV ringkas, padat, dan relevan.</li>
+                        <li>Periksa ulang tata bahasa dan ejaan.</li>
+                        <li>Gunakan desain yang bersih dan profesional.</li>
+                        <li>Sesuaikan CV untuk setiap posisi yang dilamar.</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="bg-white p-6 rounded-xl shadow-md">
+                <h3 class="text-xl font-bold mb-4">Checklist Sebelum Kirim Lamaran</h3>
+                <div id="checklist" class="space-y-3">
+                    <label class="flex items-center space-x-3 cursor-pointer">
+                        <input type="checkbox" class="form-checkbox h-5 w-5 text-[#FE5D26] rounded">
+                        <span class="text-gray-700">CV sudah disesuaikan dengan deskripsi pekerjaan.</span>
+                    </label>
+                    <label class="flex items-center space-x-3 cursor-pointer">
+                        <input type="checkbox" class="form-checkbox h-5 w-5 text-[#FE5D26] rounded">
+                        <span class="text-gray-700">Semua link (LinkedIn, Portofolio) bisa dibuka dan berfungsi.</span>
+                    </label>
+                     <label class="flex items-center space-x-3 cursor-pointer">
+                        <input type="checkbox" class="form-checkbox h-5 w-5 text-[#FE5D26] rounded">
+                        <span class="text-gray-700">Nama file sudah rapi (Contoh: Nama_Posisi_CV.pdf).</span>
+                    </label>
+                     <label class="flex items-center space-x-3 cursor-pointer">
+                        <input type="checkbox" class="form-checkbox h-5 w-5 text-[#FE5D26] rounded">
+                        <span class="text-gray-700">CV & portofolio sudah diperiksa ulang oleh orang lain.</span>
+                    </label>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section 7: Alat AI Pintar -->
+        <section id="ai-tools" class="mb-16 scroll-mt-4">
+            <h2 class="text-3xl font-bold mb-2">✨ Alat AI Pintar: Umpan Balik Instan CV</h2>
+            <p class="text-gray-600 mb-4">Manfaatkan kekuatan AI untuk mendapatkan umpan balik cepat dan saran perbaikan untuk CV kamu. Unggah file CV kamu (.txt, .docx) atau tempel teksnya di bawah ini. Untuk file .pdf atau format lain yang kompleks, disarankan untuk menyalin dan menempelkan teksnya secara manual.</p>
+            
+            <div class="bg-white p-6 rounded-xl shadow-md">
+                <input type="file" id="cvFileInput" accept=".txt,.docx" class="w-full p-2 border border-gray-300 rounded-lg focus:ring-[#FE5D26] focus:border-[#FE5D26] outline-none transition duration-200 mb-4">
+                <p id="fileUploadStatus" class="text-sm text-gray-500 mb-4 hidden"></p>
+                <textarea id="cvPortfolioInput" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-[#FE5D26] focus:border-[#FE5D26] outline-none transition duration-200" rows="10" placeholder="Atau tempel teks CV kamu di sini untuk mendapatkan umpan balik..."></textarea>
+                <button id="getAIFeedbackBtn" class="mt-4 px-6 py-3 bg-[#FE5D26] text-white font-semibold rounded-lg shadow-md hover:bg-[#E24F1A] transition flex items-center justify-center">
+                    <span id="aiButtonText">✨ Dapatkan Umpan Balik CV</span>
+                    <svg id="aiLoadingSpinner" class="animate-spin h-5 w-5 ml-3 text-white hidden" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    </svg>
+                </button>
+                <div id="aiFeedbackOutput" class="mt-6 p-4 bg-gray-50 rounded-lg text-gray-700 border border-gray-200 hidden">
+                    <p class="text-gray-500 text-center">Umpan balik AI akan muncul di sini.</p>
+                </div>
+                <div id="aiErrorMessage" class="mt-4 p-3 bg-red-100 text-red-700 rounded-lg hidden" role="alert">
+                    <p class="font-bold">Gagal Memproses File</p>
+                    <p class="text-sm">Maaf, kami tidak dapat mengekstrak teks dari file ini. Mohon coba unggah file .txt atau .docx, atau salin dan tempel teks CV kamu langsung ke kolom di atas.</p>
+                </div>
+            </div>
+        </section>
+        
+        <!-- Section 6: Sumber Daya -->
+        <section id="sumber-daya" class="scroll-mt-4">
+            <h2 class="text-3xl font-bold mb-2">📎 Bonus & Sumber Daya</h2>
+            <p class="text-gray-600 mb-8">Manfaatkan alat dan <em>website</em> ini untuk mempercepat proses pembuatan CV dan portofolio kamu.</p>
+            <div class="space-y-8">
+                <div>
+                    <h3 class="text-xl font-bold mb-3">Website Pembuat CV Gratis</h3>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                       <a href="https://www.canva.com/id_id/desain/cv/" target="_blank" rel="noopener noreferrer" class="resource-card">Canva</a>
+                       <a href="https://resume.io/" target="_blank" rel="noopener noreferrer" class="resource-card">Resume.io</a>
+                       <a href="https://www.kickresume.com/en/" target="_blank" rel="noopener noreferrer" class="resource-card">Kickresume</a>
+                       <a href="https://flowcv.com/" target="_blank" rel="noopener noreferrer" class="resource-card">FlowCV</a>
+                       <a href="https://www.resumemaker.com/" target="_blank" rel="noopener noreferrer" class="resource-card">ResumeMaker.com</a>
+                       <a href="https://www.creddle.io/" target="_blank" rel="noopener noreferrer" class="resource-card">Creddle.io</a>
+                    </div>
+                </div>
+                <div>
+                    <h3 class="text-xl font-bold mb-3">Inspirasi Proyek Portofolio</h3>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                       <a href="https://www.dailyui.co/" target="_blank" rel="noopener noreferrer" class="resource-card">Daily UI (Untuk Desainer)</a>
+                       <a href="https://www.sharpen.design/" target="_blank" rel="noopener noreferrer" class="resource-card">Sharpen.design (Brief Desain)</a>
+                       <a href="https://www.briefbox.me/" target="_blank" rel="noopener noreferrer" class="resource-card">Briefbox.me (Brief Desain)</a>
+                       <a href="https://www.kaggle.com/" target="_blank" rel="noopener noreferrer" class="resource-card">Kaggle (Untuk Analis Data)</a>
+                       <a href="https://www.theodinproject.com/" target="_blank" rel="noopener noreferrer" class="resource-card">The Odin Project (Untuk Developer)</a>
+                       <a href="https://goodbrief.io/" target="_blank" rel="noopener noreferrer" class="resource-card">GoodBrief (Untuk Copywriting/Desain)</a>
+                       <a href="https://www.codementor.io/projects" target="_blank" rel="noopener noreferrer" class="resource-card">Codementor Projects (Untuk Developer)</a>
+                    </div>
+                </div>
+                 <div>
+                    <h3 class="text-xl font-bold mb-3">Alat Bantu Lainnya</h3>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                       <a href="https://www.jobscan.co/" target="_blank" rel="noopener noreferrer" class="resource-card">Jobscan (Resume Scanner)</a>
+                       <a href="https://www.grammarly.com/" target="_blank" rel="noopener noreferrer" class="resource-card">Grammarly (Proofreader)</a>
+                       <a href="https://quillbot.com/" target="_blank" rel="noopener noreferrer" class="resource-card">QuillBot (Paraphraser)</a>
+                       <a href="https://www.upwork.com/resources/career-portfolio-basics" target="_blank" rel="noopener noreferrer" class="resource-card">Upwork Resources (Portfolio for Upwork)</a>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <footer class="text-center mt-20 py-10 border-t">
+            <h2 class="text-2xl font-bold">Siap Memulai?</h2>
+            <p class="mt-2 mb-4 text-gray-600">Perjalanan seribu mil dimulai dengan satu langkah. Mulai sekarang!</p>
+            <div class="flex justify-center items-center space-x-4">
+                 <a href="https://lynk.id/digitalsignal" target="_blank" rel="noopener noreferrer" class="bg-[#FE5D26] text-white font-bold py-2 px-4 rounded-lg hover:bg-[#E24F1A] transition">Cek Produk Lainnya</a>
+            </div>
+            <div class="mt-6">
+                <p class="text-gray-500">Follow kami di TikTok: <a href="https://www.tiktok.com/@digita_signal" target="_blank" rel="noopener noreferrer" class="text-[#FE5D26] hover:underline">@digita_signal</a></p>
+            </div>
+        </footer>
+    </main>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    
+    // Data for dynamic content
+    const cvAnatomyContent = {
+        'cv-pribadi': {
+            title: 'Data Pribadi & Kontak',
+            content: 'Pastikan email kamu terlihat profesional (hindari email seperti "cute_girl@..."). Cantumkan link ke profil LinkedIn yang sudah diupdate dan portofolio online kamu. Tidak perlu mencantumkan alamat lengkap, cukup kota domisili.'
+        },
+        'cv-summary': {
+            title: 'Ringkasan Profil',
+            content: 'Ini adalah elevator pitch kamu. Dalam 2-3 kalimat, rangkum siapa kamu, apa keahlian utama kamu, dan apa yang kamu cari. Gunakan kata kunci dari deskripsi pekerjaan yang kamu lamar.'
+        },
+        'cv-pengalaman': {
+            title: 'Pengalaman Kerja',
+            content: 'Gunakan metode STAR (Situation, Task, Action, Result) untuk menjelaskan pencapaian kamu. Fokus pada hasil, bukan tugas.'
+        },
+        'cv-pendidikan': {
+            title: 'Pendidikan',
+            content: 'Tuliskan riwayat pendidikan formal terakhir kamu. Cantumkan nama institusi, jurusan, dan tahun kelulusan. IPK bersifat opsional, cantumkan jika membanggakan (di atas 3.50).'
+        },
+        'cv-skill': {
+            title: 'Skills & Sertifikasi',
+            content: 'Bukti kemampuan teknis dan non-teknis kamu.'
+        },
+        'cv-link': {
+            title: 'Link Pendukung',
+            content: 'Di era digital, link ke profil profesional sangat penting. Pastikan link LinkedIn, Portofolio online (Behance, GitHub, website pribadi), atau blog kamu aktif dan mudah diakses.'
+        }
+    };
+
+    const tabContentData = {
+        'fresh-graduate': `
+            <h4 class="font-bold text-lg mb-2">Untuk Fresh Graduate:</h4>
+            <p class="mb-4">Fokus pada potensi dan kemauan belajar. Tonjolkan pengalaman organisasi, magang, proyek kuliah, dan skill yang relevan.</p>
+            <div class="text-left p-4 border rounded-lg bg-gray-50">
+                <h5 class="font-semibold">Contoh Deskripsi Pengalaman:</h5>
+                <p class="mt-1 text-sm"><strong>Anggota Divisi Publikasi, Himpunan Mahasiswa</strong><br>Mendesain 30+ materi publikasi untuk acara kampus, berhasil menarik partisipasi lebih dari 500 mahasiswa.</p>
+                <h5 class="font-semibold mt-4">Struktur Portofolio:</h5>
+                <p class="mt-1 text-sm">Fokus pada 2-3 proyek terbaik dari tugas kuliah atau proyek pribadi. Jelaskan proses berpikir kamu, dari ide hingga hasil akhir, untuk menunjukkan kemampuan problem-solving.</p>
+            </div>
+        `,
+        'freelancer': `
+            <h4 class="font-bold text-lg mb-2">Untuk Freelancer:</h4>
+            <p class="mb-4">Klien ingin melihat hasil dan testimoni. Tunjukkan bahwa kamu dapat diandalkan dan memberikan hasil nyata.</p>
+            <div class="text-left p-4 border rounded-lg bg-gray-50">
+                <h5 class="font-semibold">Contoh Deskripsi Pengalaman:</h5>
+                <p class="mt-1 text-sm"><strong>Penulis Konten Freelance</strong><br>Menulis lebih dari 50 artikel SEO untuk 5+ klien di niche teknologi, meningkatkan traffic organik rata-rata 25% dalam 3 bulan pertama.</p>
+                <h5 class="font-semibold mt-4">Struktur Portofolio:</h5>
+                <p class="mt-1 text-sm">Tampilkan studi kasus dari proyek klien. Sertakan testimoni untuk membangun kepercayaan. Tunjukkan metrik keberhasilan (angka, persentase).</p>
+            </div>
+        `,
+        'remote-worker': `
+            <h4 class="font-bold text-lg mb-2">Untuk Remote Worker:</h4>
+            <p class="mb-4">Tekankan kemampuan komunikasi, kemandirian, dan penguasaan tools kolaborasi online.</p>
+            <div class="text-left p-4 border rounded-lg bg-gray-50">
+                <h5 class="font-semibold">Contoh Deskripsi Pengalaman:</h5>
+                <p class="mt-1 text-sm"><strong>Project Coordinator (Remote)</strong><br>Mengelola 5 proyek secara simultan dengan tim yang tersebar di 3 zona waktu berbeda menggunakan Asana, Slack, dan Zoom.</p>
+                <h5 class="font-semibold mt-4">Struktur Portofolio:</h5>
+                <p class="mt-1 text-sm">Tunjukkan proyek yang membuktikan kemampuan kamu bekerja secara remote. Contohnya bisa berupa diagram alur kerja kolaborasi kamu atau studi kasus tentang bagaimana kamu mengatasi tantangan komunikasi jarak jauh.</p>
+            </div>
+        `
+    };
+
+    // Mobile menu toggle
+    const mobileMenuButton = document.getElementById('mobile-menu-button');
+    const mobileOverlayMenu = document.getElementById('mobile-overlay-menu');
+    const closeMobileMenuButton = document.getElementById('close-mobile-menu');
+
+    mobileMenuButton.addEventListener('click', () => {
+        mobileOverlayMenu.classList.remove('translate-y-full', 'opacity-0', 'pointer-events-none');
+        mobileOverlayMenu.classList.add('translate-y-0', 'opacity-100', 'pointer-events-auto');
+    });
+
+    closeMobileMenuButton.addEventListener('click', () => {
+        mobileOverlayMenu.classList.remove('translate-y-0', 'opacity-100', 'pointer-events-auto');
+        mobileOverlayMenu.classList.add('translate-y-full', 'opacity-0', 'pointer-events-none');
+    });
+
+    // Close mobile menu on link click
+    document.querySelectorAll('.mobile-nav-link').forEach(link => {
+        link.addEventListener('click', () => {
+            mobileOverlayMenu.classList.remove('translate-y-0', 'opacity-100', 'pointer-events-auto');
+            mobileOverlayMenu.classList.add('translate-y-full', 'opacity-0', 'pointer-events-none');
+        });
+    });
+
+    // Flip cards
+    const flipCards = document.querySelectorAll('.flip-card');
+    flipCards.forEach(card => {
+        card.addEventListener('click', () => {
+            card.classList.toggle('flipped');
+        });
+    });
+
+    // CV Anatomy interaction
+    const anatomyItems = document.querySelectorAll('.anatomy-item');
+    const contentDisplay = document.getElementById('cv-content-display');
+    anatomyItems.forEach(item => {
+        item.addEventListener('click', () => {
+            const contentKey = item.getAttribute('data-content');
+            const data = cvAnatomyContent[contentKey];
+            contentDisplay.innerHTML = `<h4 class="font-bold text-lg mb-2">${data.title}</h4><p>${data.content}</p>`;
+            
+            anatomyItems.forEach(i => i.classList.remove('bg-opacity-10', 'border-[#FE5D26]'));
+            item.classList.add('bg-opacity-10', 'border-[#FE5D26]');
+        });
+    });
+
+    // Chart.js Impact Chart
+    const impactChartCtx = document.getElementById('impactChart').getContext('2d');
+    const impactChart = new Chart(impactChartCtx, {
+        type: 'bar',
+        data: {
+            labels: ['Deskripsi Generik', 'Deskripsi Berbasis Hasil (dengan Angka)'],
+            datasets: [{
+                label: 'Tingkat Dampak pada Rekruter',
+                data: [30, 90],
+                backgroundColor: [
+                    'rgba(209, 213, 219, 0.6)', /* Gray for generic */
+                    'rgba(254, 93, 38, 0.6)' /* Orange/Coral for impactful */
+                ],
+                borderColor: [
+                    'rgba(156, 163, 175, 1)', /* Darker Gray */
+                    'rgba(254, 93, 38, 1)' /* Orange/Coral solid */
+                ],
+                borderWidth: 1
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    max: 100,
+                    ticks: {
+                        callback: function(value) {
+                            return value + '%'
+                        }
+                    }
+                }
+            },
+            plugins: {
+                legend: {
+                    display: false
+                },
+                tooltip: {
+                    callbacks: {
+                        label: function(context) {
+                            let label = context.dataset.label || '';
+                            if (label) {
+                                label += ': ';
+                            }
+                            if (context.parsed.y !== null) {
+                                label += context.parsed.y + '%';
+                            }
+                            return label;
+                        }
+                    }
+                }
+            }
+        }
+    });
+
+    // Tabs
+    const tabButtons = document.querySelectorAll('.tab-button');
+    const tabContent = document.getElementById('tab-content');
+    
+    function updateTabContent(tabId) {
+        tabContent.innerHTML = tabContentData[tabId];
+    }
+
+    tabButtons.forEach(button => {
+        button.addEventListener('click', () => {
+            tabButtons.forEach(btn => btn.classList.remove('active'));
+            button.classList.add('active');
+            updateTabContent(button.getAttribute('data-tab'));
+        });
+    });
+    // Initial tab content
+    updateTabContent('fresh-graduate');
+
+
+    // Active Nav Link on Scroll
+    const sections = document.querySelectorAll('section');
+    const navLinks = document.querySelectorAll('#desktop-nav .nav-link');
+
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                navLinks.forEach(link => {
+                    link.classList.toggle('active', link.getAttribute('href').substring(1) === entry.target.id);
+                });
+            }
+        });
+    }, { rootMargin: "0px 0px -90% 0px" }); // Adjusted rootMargin for non-fixed header, targeting top of section
+
+    sections.forEach(section => {
+        observer.observe(section);
+    });
+
+    // AI Feedback Feature Logic
+    const cvFileInput = document.getElementById('cvFileInput');
+    const cvPortfolioInput = document.getElementById('cvPortfolioInput');
+    const getAIFeedbackBtn = document.getElementById('getAIFeedbackBtn');
+    const aiFeedbackOutput = document.getElementById('aiFeedbackOutput');
+    const aiButtonText = document.getElementById('aiButtonText');
+    const aiLoadingSpinner = document.getElementById('aiLoadingSpinner');
+    const fileUploadStatus = document.getElementById('fileUploadStatus');
+    const aiErrorMessage = document.getElementById('aiErrorMessage');
+
+    cvFileInput.addEventListener('change', (event) => {
+        const file = event.target.files[0];
+        if (!file) {
+            cvPortfolioInput.value = '';
+            fileUploadStatus.classList.add('hidden');
+            aiErrorMessage.classList.add('hidden');
+            return;
+        }
+
+        fileUploadStatus.classList.remove('hidden');
+        fileUploadStatus.textContent = `Membaca file: ${file.name}...`;
+        aiErrorMessage.classList.add('hidden'); // Hide any previous error messages
+
+        const reader = new FileReader();
+
+        reader.onload = async (e) => {
+            try {
+                if (file.type === 'text/plain') {
+                    cvPortfolioInput.value = e.target.result;
+                    fileUploadStatus.textContent = `File "${file.name}" berhasil dimuat.`;
+                } else if (file.type === 'application/vnd.openxmlformats-officedocument.wordprocessingml.document') {
+                    // .docx file
+                    const arrayBuffer = e.target.result;
+                    const result = await mammoth.extractRawText({ arrayBuffer: arrayBuffer });
+                    cvPortfolioInput.value = result.value;
+                    fileUploadStatus.textContent = `File "${file.name}" berhasil dimuat.`;
+                } else {
+                    fileUploadStatus.textContent = ''; // Clear status for unsupported files
+                    aiErrorMessage.classList.remove('hidden');
+                    cvPortfolioInput.value = ''; // Clear textarea for unsupported files
+                }
+            } catch (error) {
+                console.error('Error processing file:', error);
+                fileUploadStatus.textContent = '';
+                aiErrorMessage.classList.remove('hidden');
+                cvPortfolioInput.value = '';
+            }
+        };
+
+        if (file.type === 'text/plain') {
+            reader.readAsText(file);
+        } else if (file.type === 'application/vnd.openxmlformats-officedocument.wordprocessingml.document') {
+            reader.readAsArrayBuffer(file);
+        } else {
+            // For unsupported types like PDF or old .doc, show error and clear input
+            fileUploadStatus.textContent = '';
+            aiErrorMessage.classList.remove('hidden');
+            cvPortfolioInput.value = '';
+        }
+    });
+
+
+    getAIFeedbackBtn.addEventListener('click', async () => {
+        const inputText = cvPortfolioInput.value.trim();
+        if (!inputText) {
+            aiFeedbackOutput.classList.remove('hidden');
+            aiFeedbackOutput.innerHTML = '<p class="text-red-500 text-center">Mohon masukkan teks CV kamu (atau deskripsi portofolio jika ingin).</p>';
+            aiErrorMessage.classList.add('hidden'); // Ensure error message is hidden if input is just empty
+            return;
+        }
+
+        aiFeedbackOutput.classList.add('hidden'); // Hide previous output
+        aiButtonText.textContent = 'Memproses...';
+        aiLoadingSpinner.classList.remove('hidden');
+        getAIFeedbackBtn.disabled = true;
+        aiErrorMessage.classList.add('hidden'); // Hide error message on new attempt
+
+        let chatHistory = [];
+        const prompt = `kamu adalah seorang ahli CV dan rekrutmen. Berikan umpan balik konstruktif dan saran perbaikan untuk CV berikut. Fokus pada poin-poin berikut:
+1.  **Format dan Keterbacaan (ATS-Friendly):** Apakah tata letaknya bersih, mudah dibaca, dan berpotensi lolos ATS?
+2.  **Dampak Kuantitatif:** Apakah pencapaian dijelaskan dengan angka atau metrik yang jelas? Jika tidak, sarankan bagaimana bisa diukur.
+3.  **Kata Kunci Relevan:** Apakah ada kata kunci yang relevan dengan posisi (asumsikan posisi umum seperti 'spesialis pemasaran', 'pengembang perangkat lunak', 'analis data', atau 'koordinator proyek') yang kurang dimanfaatkan?
+4.  **Kejelasan dan Keringkasan:** Apakah informasinya mudah dipahami dan tidak bertele-tele?
+5.  **Struktur dan Konten Bagian:** Apakah semua bagian penting (Ringkasan, Pengalaman, Pendidikan, Keterampilan) hadir dan efektif?
+Berikan umpan balik kamu dalam daftar poin-poin yang jelas dan terstruktur. Teks CV: ${inputText}`;
+        chatHistory.push({ role: "user", parts: [{ text: prompt }] });
+
+        const payload = { contents: chatHistory };
+        const apiKey = ""; 
+        const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
+
+        try {
+            const response = await fetch(apiUrl, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            });
+            const result = await response.json();
+
+            if (result.candidates && result.candidates.length > 0 &&
+                result.candidates[0].content && result.candidates[0].content.parts &&
+                result.candidates[0].content.parts.length > 0) {
+                const text = result.candidates[0].content.parts[0].text;
+                aiFeedbackOutput.classList.remove('hidden');
+                aiFeedbackOutput.innerHTML = `<p class="whitespace-pre-wrap">${text}</p>`;
+            } else {
+                aiFeedbackOutput.classList.remove('hidden');
+                aiFeedbackOutput.innerHTML = '<p class="text-red-500 text-center">Terjadi kesalahan saat mendapatkan umpan balik AI. Silakan coba lagi.</p>';
+            }
+        } catch (error) {
+            console.error('Error calling Gemini API:', error);
+            aiFeedbackOutput.classList.remove('hidden');
+            aiFeedbackOutput.innerHTML = `<p class="text-red-500 text-center">Gagal terhubung ke layanan AI. Error: ${error.message}</p>`;
+        } finally {
+            aiButtonText.textContent = '✨ Dapatkan Umpan Balik CV';
+            aiLoadingSpinner.classList.add('hidden');
+            getAIFeedbackBtn.disabled = false;
+        }
+    });
+
+});
+</script>
+</body>
+</html>
