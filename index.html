@@ -21,7 +21,6 @@
     - Impact Chart: Goal(Compare/Inform) -> Bar Chart -> On Scroll -> Visually reinforces the power of using numbers in a CV -> Chart.js (Canvas).
     - CV/Portfolio Examples: Goal(Organize/Compare) -> Tabbed Interface -> On Click -> Organizes extensive examples compactly and allows filtering -> HTML/CSS/JS.
     - Checklist: Goal(Provide Tool) -> Interactive Checkboxes -> On Click -> Turns a static list into a usable tool for the user -> HTML/CSS/JS.
-    - AI Feedback: Goal(Provide Feedback/Improvement) -> File Upload/Text Input -> LLM Call via Gemini API -> Text Output -> Offers instant, personalized feedback on CV/portfolio text -> JS (Gemini API, Mammoth.js for DOCX).
     CONFIRMATION: NO SVG graphics used. NO Mermaid JS used.
     -->
 
@@ -108,7 +107,6 @@
                 <a href="#contoh" class="nav-link text-gray-600 hover:text-[#FE5D26] text-sm font-medium">Template</a>
                 <a href="#kesalahan" class="nav-link text-gray-600 hover:text-[#FE5D26] text-sm font-medium">Kesalahan Umum</a>
                 <a href="#sumber-daya" class="nav-link text-gray-600 hover:text-[#FE5D26] text-sm font-medium">Bonus</a>
-                <a href="#ai-tools" class="nav-link text-gray-600 hover:text-[#FE5D26] text-sm font-medium">Alat AI</a>
             </nav>
             <button id="mobile-menu-button" class="md:hidden text-gray-700 focus:outline-none">
                 <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path></svg>
@@ -128,7 +126,6 @@
             <a href="#contoh" class="mobile-nav-link text-2xl text-gray-700 hover:text-[#FE5D26] font-semibold">Template</a>
             <a href="#kesalahan" class="mobile-nav-link text-2xl text-gray-700 hover:text-[#FE5D26] font-semibold">Kesalahan Umum</a>
             <a href="#sumber-daya" class="mobile-nav-link text-2xl text-gray-700 hover:text-[#FE5D26] font-semibold">Bonus</a>
-            <a href="#ai-tools" class="mobile-nav-link text-2xl text-gray-700 hover:text-[#FE5D26] font-semibold">Alat AI</a>
         </nav>
     </div>
 
@@ -297,32 +294,6 @@
                         <input type="checkbox" class="form-checkbox h-5 w-5 text-[#FE5D26] rounded">
                         <span class="text-gray-700">CV & portofolio sudah diperiksa ulang oleh orang lain.</span>
                     </label>
-                </div>
-            </div>
-        </section>
-
-        <!-- Section 7: Alat AI Pintar -->
-        <section id="ai-tools" class="mb-16 scroll-mt-4">
-            <h2 class="text-3xl font-bold mb-2">✨ Alat AI Pintar: Umpan Balik Instan CV</h2>
-            <p class="text-gray-600 mb-4">Manfaatkan kekuatan AI untuk mendapatkan umpan balik cepat dan saran perbaikan untuk CV kamu. Unggah file CV kamu (.txt, .docx) atau tempel teksnya di bawah ini. Untuk file .pdf atau format lain yang kompleks, disarankan untuk menyalin dan menempelkan teksnya secara manual.</p>
-            
-            <div class="bg-white p-6 rounded-xl shadow-md">
-                <input type="file" id="cvFileInput" accept=".txt,.docx" class="w-full p-2 border border-gray-300 rounded-lg focus:ring-[#FE5D26] focus:border-[#FE5D26] outline-none transition duration-200 mb-4">
-                <p id="fileUploadStatus" class="text-sm text-gray-500 mb-4 hidden"></p>
-                <textarea id="cvPortfolioInput" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-[#FE5D26] focus:border-[#FE5D26] outline-none transition duration-200" rows="10" placeholder="Atau tempel teks CV kamu di sini untuk mendapatkan umpan balik..."></textarea>
-                <button id="getAIFeedbackBtn" class="mt-4 px-6 py-3 bg-[#FE5D26] text-white font-semibold rounded-lg shadow-md hover:bg-[#E24F1A] transition flex items-center justify-center">
-                    <span id="aiButtonText">✨ Dapatkan Umpan Balik CV</span>
-                    <svg id="aiLoadingSpinner" class="animate-spin h-5 w-5 ml-3 text-white hidden" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                    </svg>
-                </button>
-                <div id="aiFeedbackOutput" class="mt-6 p-4 bg-gray-50 rounded-lg text-gray-700 border border-gray-200 hidden">
-                    <p class="text-gray-500 text-center">Umpan balik AI akan muncul di sini.</p>
-                </div>
-                <div id="aiErrorMessage" class="mt-4 p-3 bg-red-100 text-red-700 rounded-lg hidden" role="alert">
-                    <p class="font-bold">Gagal Memproses File</p>
-                    <p class="text-sm">Maaf, kami tidak dapat mengekstrak teks dari file ini. Mohon coba unggah file .txt atau .docx, atau salin dan tempel teks CV kamu langsung ke kolom di atas.</p>
                 </div>
             </div>
         </section>
@@ -579,126 +550,6 @@ document.addEventListener('DOMContentLoaded', function() {
 
     sections.forEach(section => {
         observer.observe(section);
-    });
-
-    // AI Feedback Feature Logic
-    const cvFileInput = document.getElementById('cvFileInput');
-    const cvPortfolioInput = document.getElementById('cvPortfolioInput');
-    const getAIFeedbackBtn = document.getElementById('getAIFeedbackBtn');
-    const aiFeedbackOutput = document.getElementById('aiFeedbackOutput');
-    const aiButtonText = document.getElementById('aiButtonText');
-    const aiLoadingSpinner = document.getElementById('aiLoadingSpinner');
-    const fileUploadStatus = document.getElementById('fileUploadStatus');
-    const aiErrorMessage = document.getElementById('aiErrorMessage');
-
-    cvFileInput.addEventListener('change', (event) => {
-        const file = event.target.files[0];
-        if (!file) {
-            cvPortfolioInput.value = '';
-            fileUploadStatus.classList.add('hidden');
-            aiErrorMessage.classList.add('hidden');
-            return;
-        }
-
-        fileUploadStatus.classList.remove('hidden');
-        fileUploadStatus.textContent = `Membaca file: ${file.name}...`;
-        aiErrorMessage.classList.add('hidden'); // Hide any previous error messages
-
-        const reader = new FileReader();
-
-        reader.onload = async (e) => {
-            try {
-                if (file.type === 'text/plain') {
-                    cvPortfolioInput.value = e.target.result;
-                    fileUploadStatus.textContent = `File "${file.name}" berhasil dimuat.`;
-                } else if (file.type === 'application/vnd.openxmlformats-officedocument.wordprocessingml.document') {
-                    // .docx file
-                    const arrayBuffer = e.target.result;
-                    const result = await mammoth.extractRawText({ arrayBuffer: arrayBuffer });
-                    cvPortfolioInput.value = result.value;
-                    fileUploadStatus.textContent = `File "${file.name}" berhasil dimuat.`;
-                } else {
-                    fileUploadStatus.textContent = ''; // Clear status for unsupported files
-                    aiErrorMessage.classList.remove('hidden');
-                    cvPortfolioInput.value = ''; // Clear textarea for unsupported files
-                }
-            } catch (error) {
-                console.error('Error processing file:', error);
-                fileUploadStatus.textContent = '';
-                aiErrorMessage.classList.remove('hidden');
-                cvPortfolioInput.value = '';
-            }
-        };
-
-        if (file.type === 'text/plain') {
-            reader.readAsText(file);
-        } else if (file.type === 'application/vnd.openxmlformats-officedocument.wordprocessingml.document') {
-            reader.readAsArrayBuffer(file);
-        } else {
-            // For unsupported types like PDF or old .doc, show error and clear input
-            fileUploadStatus.textContent = '';
-            aiErrorMessage.classList.remove('hidden');
-            cvPortfolioInput.value = '';
-        }
-    });
-
-
-    getAIFeedbackBtn.addEventListener('click', async () => {
-        const inputText = cvPortfolioInput.value.trim();
-        if (!inputText) {
-            aiFeedbackOutput.classList.remove('hidden');
-            aiFeedbackOutput.innerHTML = '<p class="text-red-500 text-center">Mohon masukkan teks CV kamu (atau deskripsi portofolio jika ingin).</p>';
-            aiErrorMessage.classList.add('hidden'); // Ensure error message is hidden if input is just empty
-            return;
-        }
-
-        aiFeedbackOutput.classList.add('hidden'); // Hide previous output
-        aiButtonText.textContent = 'Memproses...';
-        aiLoadingSpinner.classList.remove('hidden');
-        getAIFeedbackBtn.disabled = true;
-        aiErrorMessage.classList.add('hidden'); // Hide error message on new attempt
-
-        let chatHistory = [];
-        const prompt = `kamu adalah seorang ahli CV dan rekrutmen. Berikan umpan balik konstruktif dan saran perbaikan untuk CV berikut. Fokus pada poin-poin berikut:
-1.  **Format dan Keterbacaan (ATS-Friendly):** Apakah tata letaknya bersih, mudah dibaca, dan berpotensi lolos ATS?
-2.  **Dampak Kuantitatif:** Apakah pencapaian dijelaskan dengan angka atau metrik yang jelas? Jika tidak, sarankan bagaimana bisa diukur.
-3.  **Kata Kunci Relevan:** Apakah ada kata kunci yang relevan dengan posisi (asumsikan posisi umum seperti 'spesialis pemasaran', 'pengembang perangkat lunak', 'analis data', atau 'koordinator proyek') yang kurang dimanfaatkan?
-4.  **Kejelasan dan Keringkasan:** Apakah informasinya mudah dipahami dan tidak bertele-tele?
-5.  **Struktur dan Konten Bagian:** Apakah semua bagian penting (Ringkasan, Pengalaman, Pendidikan, Keterampilan) hadir dan efektif?
-Berikan umpan balik kamu dalam daftar poin-poin yang jelas dan terstruktur. Teks CV: ${inputText}`;
-        chatHistory.push({ role: "user", parts: [{ text: prompt }] });
-
-        const payload = { contents: chatHistory };
-        const apiKey = ""; 
-        const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
-
-        try {
-            const response = await fetch(apiUrl, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(payload)
-            });
-            const result = await response.json();
-
-            if (result.candidates && result.candidates.length > 0 &&
-                result.candidates[0].content && result.candidates[0].content.parts &&
-                result.candidates[0].content.parts.length > 0) {
-                const text = result.candidates[0].content.parts[0].text;
-                aiFeedbackOutput.classList.remove('hidden');
-                aiFeedbackOutput.innerHTML = `<p class="whitespace-pre-wrap">${text}</p>`;
-            } else {
-                aiFeedbackOutput.classList.remove('hidden');
-                aiFeedbackOutput.innerHTML = '<p class="text-red-500 text-center">Terjadi kesalahan saat mendapatkan umpan balik AI. Silakan coba lagi.</p>';
-            }
-        } catch (error) {
-            console.error('Error calling Gemini API:', error);
-            aiFeedbackOutput.classList.remove('hidden');
-            aiFeedbackOutput.innerHTML = `<p class="text-red-500 text-center">Gagal terhubung ke layanan AI. Error: ${error.message}</p>`;
-        } finally {
-            aiButtonText.textContent = '✨ Dapatkan Umpan Balik CV';
-            aiLoadingSpinner.classList.add('hidden');
-            getAIFeedbackBtn.disabled = false;
-        }
     });
 
 });
